@@ -421,7 +421,7 @@ h1,h2,h3{
           <div><span class="line-tag" id="phraseTag" style="--c:var(--est)">Estudio y tiempo</span></div>
           <h1 id="phrase">¿Partes todo a última hora?</h1>
         </div>
-        <p class="attract-sub">Elige en el mapa la línea que más se parece a lo que quieres mejorar. Responde <b>3 preguntas</b> y te mostramos dónde agendar. Toma <b>1 minuto</b>.</p>
+        <p class="attract-sub">Elige en el mapa la línea de lo que quieres aprender o fortalecer. Responde <b>3 preguntas</b> y te mostramos dónde agendar. Toma <b>1 minuto</b>.</p>
         <div class="attract-cta">
           <div class="map-hint pulse">Toca una línea del mapa →</div>
         </div>
@@ -439,7 +439,7 @@ h1,h2,h3{
       <div class="options" id="options"></div>
       <div class="q-foot">
         <button class="btn btn-line" id="backBtn">← Volver</button>
-        <div class="hint">Toca la opción que más se parezca a ti</div>
+        <div class="hint">Toca la opción que más te represente</div>
       </div>
     </section>
 
@@ -511,8 +511,8 @@ const B = "https://bookings.cloud.microsoft/book/AgendaUnidaddeTrayectoriaEstudi
 const SERVICES = {
   gen:{name:"Orientación inicial", map:"ORIENTACIÓN",
     url:B+"QIGmqvTs9kqsbEGfyA8kcA2?ismsaljsauthenabled",
-    title:"Una conversación para ordenar lo que está pasando.",
-    work:["Ordenar lo que estás viviendo","Reconocer qué es prioritario","Definir tu próximo paso"]},
+    title:"Una conversación para armar tu ruta de aprendizaje.",
+    work:["Conocer los apoyos de la Unidad","Definir qué quieres desarrollar primero","Armar tu plan de aprendizaje"]},
   lea:{name:"Lectura y análisis de textos", map:"LECTURA",
     url:B+"uI6SW_jY3kGzQmiyHV6AOg2?ismsaljsauthenabled",
     title:"Leer textos y consignas con más claridad.",
@@ -539,98 +539,95 @@ const SERVICES = {
     work:["Planificar con tus tiempos reales","Estudiar con técnicas activas","Comprobar lo que aprendiste"]},
   mot:{name:"Consejería: motivación académica", map:"MOTIVACIÓN",
     url:B+"PCDh-1-vp06lsBqxa-Gksw2?ismsaljsauthenabled",
-    title:"Reconectar con tus metas y sostener tu ritmo.",
-    work:["Reconocer qué te mueve","Proponerte metas alcanzables","Sostener hábitos durante el semestre"]},
+    title:"Ponerte metas de aprendizaje y sostener tu ritmo de estudio.",
+    work:["Definir metas de aprendizaje alcanzables","Construir hábitos de estudio","Conectar tus estudios con tus objetivos"]},
   psi:{name:"Consejería psicoeducativa", map:"PSICOEDUCATIVA",
     url:B+"YNkzUoF0P0iywGwOHk8c5Q2?ismsaljsauthenabled",
-    title:"Un espacio para conversar lo que te pasa y cuidar tu bienestar.",
-    work:["Poner en palabras lo que estás viviendo","Reconocer tus recursos y apoyos","Definir pasos posibles para ti"]}
+    title:"Conocer cómo aprendes y fortalecer tus estrategias.",
+    work:["Reconocer las estrategias que te funcionan","Prepararte para tus evaluaciones","Organizar tu aprendizaje en la U"]}
 };
-/* Por qué se suma un segundo apoyo */
-const EXTRA_WHY = {
-  est:"Suma Estrategias de estudio para recuperar y usar lo aprendido cuando estudias por tu cuenta.",
-  mot:"Suma la Consejería de motivación académica para reconectar con tus metas y sostener las ganas mientras trabajas lo académico.",
-  psi:"Suma la Consejería psicoeducativa para conversar lo que te está pesando y cuidar tu bienestar mientras estudias."
-};
+
 
 const IDLE_SECONDS = 60;
 const PHRASE_SECONDS = 4;
 
 const PHRASES = [
-  ["est","¿Partes todo a última hora?"],
-  ["lea","¿Subrayas casi todo el texto?"],
-  ["ora","¿Te tiemblan las manos antes de disertar?"],
-  ["mat","¿En clases lo entiendes y en la casa se te borra?"],
-  ["esc","¿La hoja en blanco te mira de vuelta?"],
-  ["fis","¿Lees el problema y no sabes qué fórmula usar?"],
-  ["mot","¿Sabes lo que tienes que hacer y no logras partir?"],
-  ["psi","¿Sientes que el semestre te está pesando?"]
+  ["est","¿Quieres llegar a tus entregas con tiempo?"],
+  ["lea","¿Quieres leer papers con más claridad?"],
+  ["ora","¿Quieres exponer con más seguridad?"],
+  ["mat","¿Quieres entender por qué funciona cada paso?"],
+  ["esc","¿Quieres ordenar tus ideas antes de escribir?"],
+  ["fis","¿Quieres plantear mejor los problemas de física?"],
+  ["mot","¿Quieres ponerte metas de estudio alcanzables?"],
+  ["psi","¿Quieres conocer mejor cómo aprendes?"]
 ];
 
 /* =========================================================
    CONTENIDO DEL INSTRUMENTO
+   Enfoque: desarrollo de aprendizajes. Las opciones nombran
+   lo que el estudiante quiere aprender o fortalecer.
    Cada ruta tiene la misma lógica:
-   P1 · Lo que te pasa  (situación concreta → define el foco de la sesión)
-   P2 · Tu contexto     (tarea, curso o momento → qué llevar a la sesión)
-   P3 · Cómo llegas hoy (disposición → cómo partir la conversación)
+   P1 · Lo que quieres aprender (define el foco de la sesión)
+   P2 · Tu contexto             (tarea, curso o momento → qué llevar)
+   P3 · Lo que buscas           (qué llevarte de la primera sesión)
    Campos de cada opción:
-     t    = título de la opción (primera persona, responde la pregunta)
+     t    = título de la opción
      d    = ejemplo breve bajo el título
      say  = frase completa que aparece en "Tu recorrido"
      need = foco de la sesión (solo P1)
      bring= qué llevar o pensar para la primera sesión (solo P2)
    ========================================================= */
 const AREAS = [
-  {id:"estudio", line:"est", t:"Organizar mi tiempo y estudiar mejor", say:"Quiero organizar mejor mi tiempo y mi estudio.",
-   q2:{q:"¿Qué te pasa más seguido con tu tiempo y tu estudio?", h:"Piensa en tus últimas semanas.",
+  {id:"estudio", line:"est", t:"Organizar mi tiempo y estudiar mejor", say:"Quiero organizar mi tiempo y mi estudio.",
+   q2:{q:"¿Qué te gustaría aprender a hacer?", h:"Elige lo que más te serviría hoy.",
      o:[
-      {t:"Dejo todo para última hora", d:"Lo urgente termina ganándole a lo importante.", say:"Dejo las cosas para última hora.", need:"Vas a trabajar cómo anticiparte: ver lo que viene antes de que se vuelva urgente."},
-      {t:"Mis planes no se cumplen", d:"Planifico, pero los tiempos reales no calzan.", say:"Hago planes, pero no logro cumplirlos.", need:"Vas a trabajar cómo planificar con tus tiempos reales, incluyendo imprevistos."},
-      {t:"Me distraigo al estudiar", d:"El celular y todo lo demás me llaman.", say:"Me distraigo cuando estudio.", need:"Vas a trabajar cómo sostener la atención y armar un espacio de estudio que te ayude."},
-      {t:"Estudio, pero no me queda", d:"Le dedico horas y no sé si aprendí.", say:"Estudio harto, pero no me queda.", need:"Vas a trabajar técnicas de estudio activo para recordar y comprobar lo que aprendes."}
+      {t:"Anticipar mis entregas", d:"Ver lo que viene y partir con tiempo.", say:"Quiero aprender a anticipar mis entregas.", need:"Vas a desarrollar formas de planificar el semestre y anticipar tus semanas con más carga."},
+      {t:"Planificar con tiempos reales", d:"Armar planes que se puedan cumplir.", say:"Quiero aprender a planificar con tiempos reales.", need:"Vas a desarrollar planes de trabajo que consideren tus tiempos reales e imprevistos."},
+      {t:"Concentrarme al estudiar", d:"Sostener la atención por más tiempo.", say:"Quiero aprender a concentrarme mejor al estudiar.", need:"Vas a desarrollar estrategias para sostener la atención y organizar tu espacio de estudio."},
+      {t:"Estudiar de forma activa", d:"Que lo que estudio me quede.", say:"Quiero aprender a estudiar de forma activa.", need:"Vas a desarrollar técnicas de estudio activo para recordar y comprobar lo que aprendes."}
      ]},
-   q3:{q:"¿Cuándo se nota más?", h:"Elige el momento que más se repite.",
+   q3:{q:"¿Para qué lo necesitas más?", h:"Elige lo más cercano.",
      o:[
-      {t:"En semanas de pruebas", d:"Cuando se juntan varias evaluaciones.", say:"Se nota más en semanas de pruebas.", bring:"Lleva tu calendario de evaluaciones del semestre."},
-      {t:"Con trabajos largos", d:"Informes, ensayos o proyectos por etapas.", say:"Se nota más con los trabajos largos.", bring:"Lleva la pauta del trabajo largo que tengas en curso."},
-      {t:"Cuando estudio en la casa", d:"Con distracciones alrededor.", say:"Se nota más cuando estudio en la casa.", bring:"Piensa en cómo es hoy tu rutina de estudio."},
-      {t:"Cuando trabajo o cuido a alguien", d:"Me queda poco tiempo para la U.", say:"Se nota más porque combino la U con trabajo o cuidados.", bring:"Lleva tu horario semanal, con trabajo y otras responsabilidades."}
+      {t:"Semanas de pruebas", d:"Cuando se juntan varias evaluaciones.", say:"Lo necesito para mis semanas de pruebas.", bring:"Lleva tu calendario de evaluaciones del semestre."},
+      {t:"Trabajos largos", d:"Informes, ensayos o proyectos por etapas.", say:"Lo necesito para mis trabajos largos.", bring:"Lleva la pauta del trabajo largo que tengas en curso."},
+      {t:"Estudiar en la casa", d:"Aprovechar mejor mis horas de estudio.", say:"Lo necesito para estudiar en la casa.", bring:"Piensa en cómo es hoy tu rutina de estudio."},
+      {t:"Combinar la U con otras actividades", d:"Trabajo, cuidados u otras responsabilidades.", say:"Lo necesito para combinar la U con otras actividades.", bring:"Lleva tu horario semanal, con todas tus actividades."}
      ]}},
 
   {id:"lectura", line:"lea", t:"Leer textos de la U", say:"Quiero leer mejor los textos de la U.",
-   q2:{q:"¿Qué te pasa más seguido cuando lees para un curso?", h:"Piensa en el último texto que te pidieron leer.",
+   q2:{q:"¿Qué te gustaría aprender a hacer al leer?", h:"Piensa en los textos de tus cursos.",
      o:[
-      {t:"No sé bien qué me piden", d:"Leo la consigna varias veces y me quedan dudas.", say:"Me cuesta entender qué me piden las consignas.", need:"Vas a trabajar cómo interpretar consignas: qué se pide, cómo se evalúa y por dónde partir."},
-      {t:"Subrayo casi todo", d:"Me cuesta distinguir las ideas principales.", say:"Subrayo casi todo y no distingo lo principal.", need:"Vas a trabajar cómo reconocer las ideas centrales de un texto y cómo se relacionan."},
-      {t:"Entiendo, pero después se me olvida", d:"Al rato no puedo explicar lo que leí.", say:"Entiendo mientras leo, pero después se me olvida.", need:"Vas a trabajar estrategias de lectura activa para recordar y usar lo que lees."}
+      {t:"Interpretar consignas", d:"Tener claro qué me piden y cómo se evalúa.", say:"Quiero aprender a interpretar consignas.", need:"Vas a desarrollar estrategias para interpretar consignas: qué se pide, cómo se evalúa y por dónde partir."},
+      {t:"Identificar las ideas centrales", d:"Distinguir lo principal de lo secundario.", say:"Quiero aprender a identificar las ideas centrales de un texto.", need:"Vas a desarrollar estrategias para reconocer las ideas centrales de un texto y cómo se relacionan."},
+      {t:"Recordar y usar lo que leo", d:"Poder explicarlo y aplicarlo después.", say:"Quiero aprender a recordar y usar lo que leo.", need:"Vas a desarrollar estrategias de lectura activa para recordar y usar lo que lees."}
      ]},
-   q3:{q:"¿Con qué tipo de texto te pasa más?", h:"Piensa en tus cursos de este semestre.",
+   q3:{q:"¿Con qué tipo de texto lo quieres practicar?", h:"Piensa en tus cursos de este semestre.",
      o:[
-      {t:"Papers y artículos", d:"Textos de investigación de mi carrera.", say:"Me pasa sobre todo con papers y artículos.", bring:"Lleva un artículo que te hayan asignado."},
-      {t:"Textos teóricos", d:"Autores densos y conceptos abstractos.", say:"Me pasa sobre todo con textos teóricos.", bring:"Lleva el texto teórico que estés leyendo."},
-      {t:"Consignas de evaluaciones", d:"Instrucciones de trabajos y pruebas.", say:"Me pasa sobre todo con las consignas de evaluaciones.", bring:"Lleva la consigna de un trabajo que tengas pendiente."}
+      {t:"Papers y artículos", d:"Textos de investigación de mi carrera.", say:"Lo quiero practicar con papers y artículos.", bring:"Lleva un artículo que te hayan asignado."},
+      {t:"Textos teóricos", d:"Autores y conceptos de mis cursos.", say:"Lo quiero practicar con textos teóricos.", bring:"Lleva el texto teórico que estés leyendo."},
+      {t:"Consignas de evaluaciones", d:"Instrucciones de trabajos y pruebas.", say:"Lo quiero practicar con consignas de evaluaciones.", bring:"Lleva la consigna de un trabajo que tengas pendiente."}
      ]}},
 
   {id:"escritura", line:"esc", t:"Escribir mis trabajos", say:"Quiero escribir mejor mis trabajos.",
-   q2:{q:"¿En qué momento se te complica más escribir?", h:"Piensa en el último trabajo escrito que entregaste.",
+   q2:{q:"¿Qué parte de la escritura te gustaría fortalecer?", h:"Piensa en tus próximos trabajos escritos.",
      o:[
-      {t:"Al empezar", d:"Tengo ideas, pero no sé cómo ordenarlas.", say:"Se me complica empezar: tengo ideas y no sé cómo ordenarlas.", need:"Vas a trabajar cómo planificar un texto: pasar de ideas sueltas a un esquema."},
-      {t:"Mientras escribo", d:"Me cuesta conectar párrafos y no perder el hilo.", say:"Se me complica conectar los párrafos sin perder el hilo.", need:"Vas a trabajar cómo desarrollar y conectar párrafos en torno a una idea central."},
-      {t:"Al usar fuentes", d:"No sé bien cómo citar o combinar autores con mis ideas.", say:"Se me complica usar fuentes y combinarlas con mis ideas.", need:"Vas a trabajar cómo citar, parafrasear y tomar posición frente a los autores."}
+      {t:"Planificar el texto", d:"Ordenar mis ideas antes de redactar.", say:"Quiero fortalecer cómo planifico mis textos.", need:"Vas a desarrollar cómo planificar un texto: pasar de ideas sueltas a un esquema."},
+      {t:"Desarrollar párrafos", d:"Conectar ideas y sostener el hilo.", say:"Quiero fortalecer cómo desarrollo y conecto párrafos.", need:"Vas a desarrollar cómo construir y conectar párrafos en torno a una idea central."},
+      {t:"Usar fuentes", d:"Citar y dialogar con autores.", say:"Quiero fortalecer cómo uso fuentes en mis textos.", need:"Vas a desarrollar cómo citar, parafrasear y tomar posición frente a los autores."}
      ]},
    q3:{q:"¿Qué tipo de texto necesitas escribir?", h:"Elige el más cercano.",
      o:[
       {t:"Un ensayo", d:"Texto argumentativo o de opinión fundamentada.", say:"Necesito escribir un ensayo.", bring:"Lleva la pauta y lo que tengas escrito, aunque sea un esquema."},
       {t:"Un informe", d:"De laboratorio, práctica o investigación.", say:"Necesito escribir un informe.", bring:"Lleva la pauta del informe y tus datos o notas."},
-      {t:"Respuestas de desarrollo", d:"Preguntas abiertas en pruebas.", say:"Necesito responder mejor las preguntas de desarrollo.", bring:"Lleva una prueba anterior con comentarios, si la tienes."}
+      {t:"Respuestas de desarrollo", d:"Preguntas abiertas en pruebas.", say:"Necesito escribir respuestas de desarrollo en pruebas.", bring:"Lleva una prueba anterior con comentarios, si la tienes."}
      ]}},
 
   {id:"oral", line:"ora", t:"Exponer y hablar en público", say:"Quiero exponer y hablar en público con más seguridad.",
-   q2:{q:"¿Qué te pasa más seguido cuando expones?", h:"Piensa en tu última presentación.",
+   q2:{q:"¿Qué te gustaría fortalecer al exponer?", h:"Piensa en tu próxima presentación.",
      o:[
-      {t:"Los nervios me juegan en contra", d:"Me cuesta sentirme con seguridad frente al curso.", say:"Los nervios me juegan en contra al exponer.", need:"Vas a trabajar cómo preparar y ensayar tu exposición para manejar los nervios."},
-      {t:"Me enredo con lo que voy a decir", d:"Me cuesta ordenar las ideas y manejar el tiempo.", say:"Me enredo al ordenar lo que voy a decir.", need:"Vas a trabajar cómo estructurar tu exposición para que la audiencia te siga."},
-      {t:"Me complican las preguntas", d:"Me cuesta responder o defender mis ideas.", say:"Me complica responder preguntas y defender mis ideas.", need:"Vas a trabajar cómo anticipar preguntas y responder con claridad."}
+      {t:"Mi seguridad frente al público", d:"Preparar y ensayar para hablar con confianza.", say:"Quiero fortalecer mi seguridad al exponer.", need:"Vas a desarrollar formas de preparar y ensayar tu exposición para hablar con confianza."},
+      {t:"La estructura de mi exposición", d:"Ordenar ideas y manejar el tiempo.", say:"Quiero fortalecer cómo estructuro mis exposiciones.", need:"Vas a desarrollar cómo estructurar tu exposición para que la audiencia te siga."},
+      {t:"Mis respuestas a preguntas", d:"Defender mis ideas con claridad.", say:"Quiero fortalecer cómo respondo preguntas.", need:"Vas a desarrollar cómo anticipar preguntas y responder con claridad."}
      ]},
    q3:{q:"¿Qué tienes por delante?", h:"Elige la instancia más próxima.",
      o:[
@@ -640,11 +637,11 @@ const AREAS = [
      ]}},
 
   {id:"mate", line:"mat", t:"Avanzar en matemática", say:"Quiero avanzar en matemática.",
-   q2:{q:"¿Qué te pasa más seguido con los ejercicios?", h:"Piensa en la última guía que trabajaste.",
+   q2:{q:"¿Qué te gustaría aprender a hacer en matemática?", h:"Piensa en tus guías y ejercicios.",
      o:[
-      {t:"No sé por dónde empezar", d:"Miro el ejercicio y no reconozco qué procedimiento usar.", say:"No sé por dónde empezar los ejercicios.", need:"Vas a trabajar cómo leer un problema y reconocer qué herramienta usar."},
-      {t:"Sigo los pasos sin entenderlos", d:"Resuelvo de memoria y no sé por qué funciona.", say:"Sigo los pasos de memoria, sin entender por qué funcionan.", need:"Vas a trabajar el sentido de cada procedimiento, para que puedas explicarlo."},
-      {t:"En clases entiendo, después se me olvida", d:"Cuando estudio por mi cuenta no me resulta.", say:"Entiendo en clases, pero después se me olvida.", need:"Vas a trabajar cómo practicar para que lo aprendido en clases te quede."}
+      {t:"Plantear los ejercicios", d:"Reconocer qué procedimiento usar.", say:"Quiero aprender a plantear los ejercicios.", need:"Vas a desarrollar cómo leer un problema y reconocer qué herramienta usar."},
+      {t:"Entender los procedimientos", d:"Saber por qué funciona cada paso.", say:"Quiero entender por qué funcionan los procedimientos.", need:"Vas a desarrollar la comprensión de cada procedimiento, para que puedas explicarlo."},
+      {t:"Practicar de forma efectiva", d:"Que lo visto en clases me quede.", say:"Quiero aprender a practicar para que me quede lo visto en clases.", need:"Vas a desarrollar formas de practicar que consoliden lo aprendido en clases."}
      ]},
    q3:{q:"¿En qué curso lo necesitas?", h:"Elige el más cercano.",
      o:[
@@ -655,11 +652,11 @@ const AREAS = [
      ]}},
 
   {id:"fisica", line:"fis", t:"Avanzar en física", say:"Quiero avanzar en física.",
-   q2:{q:"¿Qué te pasa más seguido con los problemas de física?", h:"Piensa en la última guía que trabajaste.",
+   q2:{q:"¿Qué te gustaría aprender a hacer en física?", h:"Piensa en tus guías de problemas.",
      o:[
-      {t:"No sé qué fórmula usar", d:"Leo el enunciado y no sé cómo plantearlo.", say:"Leo el problema y no sé qué fórmula usar.", need:"Vas a trabajar cómo pasar del enunciado al planteamiento: qué datos tienes y qué ley aplicar."},
-      {t:"Me enredo en el desarrollo", d:"Despejes, unidades y pasos intermedios.", say:"Me enredo en los despejes y las unidades.", need:"Vas a trabajar cómo ordenar el desarrollo y cuidar las unidades paso a paso."},
-      {t:"Llego al resultado sin entenderlo", d:"Calculo, pero no sé qué significa físicamente.", say:"Llego al resultado, pero no entiendo qué significa.", need:"Vas a trabajar cómo interpretar el fenómeno y darle sentido a tus resultados."}
+      {t:"Plantear problemas", d:"Pasar del enunciado a las ecuaciones.", say:"Quiero aprender a plantear problemas de física.", need:"Vas a desarrollar cómo pasar del enunciado al planteamiento: qué datos tienes y qué ley aplicar."},
+      {t:"Ordenar el desarrollo", d:"Despejes, unidades y pasos intermedios.", say:"Quiero aprender a ordenar el desarrollo y las unidades.", need:"Vas a desarrollar cómo ordenar el desarrollo y cuidar las unidades paso a paso."},
+      {t:"Interpretar resultados", d:"Entender qué significa lo que calculo.", say:"Quiero aprender a interpretar mis resultados.", need:"Vas a desarrollar cómo interpretar el fenómeno y darle sentido a tus resultados."}
      ]},
    q3:{q:"¿Qué unidad estás viendo?", h:"Elige la más cercana.",
      o:[
@@ -668,61 +665,61 @@ const AREAS = [
       {t:"Ondas, fluidos o calor", d:"Oscilaciones, presión, termodinámica.", say:"Estoy viendo ondas, fluidos o calor.", bring:"Lleva la guía de problemas y tus intentos, aunque estén incompletos."}
      ]}},
 
-  {id:"ganas", line:"mot", t:"Recuperar las ganas de estudiar", say:"Quiero recuperar las ganas de estudiar.",
-   q2:{q:"¿Qué te pasa más seguido con tus ganas de estudiar?", h:"No hay respuestas buenas ni malas.",
+  {id:"motivacion", line:"mot", t:"Ponerme metas y sostener mi ritmo", say:"Quiero fortalecer mi motivación académica.",
+   q2:{q:"¿Qué te gustaría desarrollar?", h:"Elige lo que más te serviría hoy.",
      o:[
-      {t:"Me cuesta partir", d:"Sé lo que tengo que hacer y lo postergo.", say:"Sé lo que tengo que hacer, pero me cuesta partir.", need:"Vas a trabajar formas concretas de dar el primer paso."},
-      {t:"Le perdí el sentido a lo que estudio", d:"Me pregunto para qué estoy en esta carrera.", say:"Le perdí el sentido a lo que estudio.", need:"Vas a conversar sobre tus metas y lo que te trajo a tu carrera."},
-      {t:"Parto con todo y después me desinflo", d:"Me cuesta mantener el ritmo.", say:"Parto con todo, pero después me desinflo.", need:"Vas a trabajar cómo sostener tu motivación durante el semestre."}
+      {t:"Ponerme metas alcanzables", d:"Definir objetivos claros para el semestre.", say:"Quiero aprender a ponerme metas alcanzables.", need:"Vas a desarrollar cómo definir metas de aprendizaje claras y alcanzables."},
+      {t:"Sostener mi ritmo de estudio", d:"Mantener la constancia durante el semestre.", say:"Quiero aprender a sostener mi ritmo de estudio.", need:"Vas a desarrollar hábitos que te ayuden a mantener la constancia durante el semestre."},
+      {t:"Conectar lo que estudio con mis objetivos", d:"Darle sentido a lo que aprendo.", say:"Quiero conectar lo que estudio con mis objetivos.", need:"Vas a desarrollar cómo vincular lo que aprendes con tus objetivos académicos."}
      ]},
-   q3:{q:"¿Desde cuándo lo notas?", h:"Elige lo más cercano.",
+   q3:{q:"¿Para qué plazo lo quieres trabajar?", h:"Elige lo más cercano.",
      o:[
-      {t:"Desde este semestre", d:"Algo cambió hace poco.", say:"Lo noto desde este semestre.", bring:"Piensa en qué cambió este semestre."},
-      {t:"Desde que entré a la U", d:"Me ha costado sentirme en mi lugar.", say:"Lo noto desde que entré a la U.", bring:"Piensa en cómo fue tu llegada a la universidad."},
-      {t:"Va y viene", d:"Hay semanas buenas y otras no.", say:"Va y viene: hay semanas buenas y otras no.", bring:"Piensa en qué pasa en tus semanas buenas."}
+      {t:"Este semestre", d:"Metas de corto plazo.", say:"Lo quiero trabajar para este semestre.", bring:"Lleva tu calendario del semestre."},
+      {t:"Una evaluación que viene", d:"Prepararme con tiempo.", say:"Lo quiero trabajar para una evaluación que viene.", bring:"Lleva la fecha y el temario de esa evaluación."},
+      {t:"Mi carrera", d:"Metas de mediano plazo.", say:"Lo quiero trabajar pensando en mi carrera.", bring:"Piensa en qué te gustaría lograr en tu carrera."}
      ]}},
 
-  {id:"bienestar", line:"psi", t:"Cuidar mi bienestar", say:"Quiero cuidar mi bienestar.",
-   q2:{q:"¿Qué describe mejor lo que te está pasando?", h:"No hay respuestas buenas ni malas.",
+  {id:"aprender", line:"psi", t:"Conocer cómo aprendo", say:"Quiero conocer mejor cómo aprendo.",
+   q2:{q:"¿Qué te gustaría desarrollar?", h:"Elige lo que más te serviría hoy.",
      o:[
-      {t:"Siento mucha presión", d:"Por evaluaciones, expectativas o exigencias.", say:"Siento mucha presión con la U.", need:"Vas a conversar sobre la presión que sientes y sobre formas de cuidarte."},
-      {t:"No logro equilibrar la U con mi vida", d:"Trabajo, familia, cuidados u otros.", say:"Me cuesta equilibrar la U con el resto de mi vida.", need:"Vas a conversar sobre cómo equilibrar tus responsabilidades y cuidar tu bienestar."},
-      {t:"Estoy pasando por un momento difícil", d:"Y lo estoy notando en mis estudios.", say:"Estoy pasando por un momento difícil.", need:"Vas a conversar sobre lo que estás viviendo y qué apoyos te pueden servir."}
+      {t:"Reconocer mi forma de aprender", d:"Saber qué estrategias me funcionan.", say:"Quiero reconocer qué estrategias me funcionan para aprender.", need:"Vas a desarrollar un mejor conocimiento de cómo aprendes y qué estrategias te funcionan."},
+      {t:"Prepararme para las evaluaciones", d:"Llegar a las pruebas con más confianza.", say:"Quiero prepararme mejor para las evaluaciones.", need:"Vas a desarrollar estrategias para prepararte y llegar a tus evaluaciones con más confianza."},
+      {t:"Adaptarme al ritmo universitario", d:"Organizar mi aprendizaje según las exigencias de la U.", say:"Quiero adaptarme mejor al ritmo universitario.", need:"Vas a desarrollar estrategias para organizar tu aprendizaje según las exigencias de la universidad."}
      ]},
-   q3:{q:"¿Desde cuándo lo notas?", h:"Elige lo más cercano.",
+   q3:{q:"¿En qué momento de tu carrera estás?", h:"Elige el más cercano.",
      o:[
-      {t:"Desde hace poco", d:"Algo cambió en las últimas semanas.", say:"Lo noto desde hace poco.", bring:"Piensa en qué te gustaría conversar primero."},
-      {t:"Desde este semestre", d:"Se ha ido acumulando.", say:"Lo noto desde este semestre.", bring:"Piensa en qué momentos de la semana se hace más pesado."},
-      {t:"Hace bastante tiempo", d:"Viene de antes.", say:"Lo noto hace bastante tiempo.", bring:"Piensa en qué te ha ayudado en otros momentos."}
+      {t:"Primer año", d:"Recién llegando a la universidad.", say:"Estoy en primer año.", bring:"Lleva tu horario y la lista de tus ramos."},
+      {t:"Segundo año o más", d:"Ya conozco la dinámica de la U.", say:"Estoy en segundo año o más.", bring:"Piensa en qué estrategias te han funcionado hasta ahora."},
+      {t:"Cerca de egresar", d:"Práctica, tesis o últimos ramos.", say:"Estoy cerca de egresar.", bring:"Lleva lo que tengas de tu práctica, tesis o últimos ramos."}
      ]}},
 
-  {id:"claro", line:"gen", t:"Todavía no lo tengo claro", say:"Todavía no tengo claro qué necesito.",
-   q2:{q:"¿Qué describe mejor tu situación?", h:"Llegar sin tenerlo claro también es un punto de partida.",
+  {id:"claro", line:"gen", t:"Todavía no lo tengo claro", say:"Todavía no tengo claro qué apoyo me sirve.",
+   q2:{q:"¿Qué te gustaría hacer?", h:"Llegar sin tenerlo claro también es un punto de partida.",
      o:[
-      {t:"Tengo varias cosas mezcladas", d:"Quiero ordenarlas antes de elegir un apoyo.", say:"Tengo varias cosas mezcladas.", need:"Vas a conversar para ordenar tu situación y definir qué va primero."},
-      {t:"Quiero conversarlo con alguien", d:"Pensarlo en voz alta con una persona del equipo.", say:"Quiero conversarlo con alguien del equipo.", need:"Vas a conversar con alguien del equipo para ver por dónde seguir."},
-      {t:"Creo que necesito más de un apoyo", d:"Quiero saber cuál va primero.", say:"Creo que necesito más de un apoyo.", need:"Vas a conversar para decidir qué apoyo te conviene primero."}
+      {t:"Conocer los apoyos de la Unidad", d:"Saber qué servicios existen.", say:"Quiero conocer los apoyos de la Unidad.", need:"Vas a conocer los apoyos de la Unidad y cuál se ajusta a lo que quieres aprender."},
+      {t:"Definir qué quiero desarrollar", d:"Ordenar mis prioridades de aprendizaje.", say:"Quiero definir qué aprendizajes desarrollar primero.", need:"Vas a definir tus prioridades de aprendizaje para este semestre."},
+      {t:"Armar un plan de aprendizaje", d:"Tener una ruta para el semestre.", say:"Quiero armar un plan de aprendizaje para el semestre.", need:"Vas a armar un plan de aprendizaje con pasos concretos para el semestre."}
      ]},
-   q3:{q:"¿Dónde se nota más?", h:"Elige lo que más pesa hoy.",
+   q3:{q:"¿En qué área te gustaría avanzar?", h:"Elige la más cercana.",
      o:[
-      {t:"En mis ramos", d:"Notas, cursos y evaluaciones.", say:"Se nota más en mis ramos.", bring:"Lleva tu lista de ramos y próximas evaluaciones."},
-      {t:"En mi organización", d:"Horarios, hábitos y tiempos.", say:"Se nota más en mi organización.", bring:"Lleva tu horario semanal."},
-      {t:"En mi ánimo", d:"Cómo me siento con la U.", say:"Se nota más en mi ánimo.", bring:"Piensa en qué te gustaría que fuera distinto."}
+      {t:"Lectura y escritura", d:"Textos, trabajos y consignas.", say:"Me gustaría avanzar en lectura y escritura.", bring:"Lleva un texto o trabajo de alguno de tus cursos."},
+      {t:"Matemática o ciencias", d:"Ejercicios y problemas.", say:"Me gustaría avanzar en matemática o ciencias.", bring:"Lleva una guía o ejercicio de tus cursos."},
+      {t:"Organización y estudio", d:"Tiempos, hábitos y técnicas.", say:"Me gustaría avanzar en organización y estudio.", bring:"Lleva tu horario semanal."}
      ]}}
 ];
 
 /* Última pregunta · común a todas las rutas */
-const Q4 = {q:"¿Cómo llegas hoy a esto?", h:"Tu respuesta ayuda a preparar tu primera sesión.",
+const Q4 = {q:"¿Qué te gustaría llevarte de la primera sesión?", h:"Tu respuesta ayuda a preparar la sesión.",
   o:[
-    {t:"Con ganas de trabajarlo", d:"Quiero herramientas concretas.", say:"Llego con ganas de trabajarlo.", tip:"Parte contando qué quieres lograr este semestre."},
-    {t:"Con pocas ganas", d:"Me cuesta partir o mantener el ritmo.", say:"Llego con pocas ganas.", tip:"Cuenta también cómo están tus ganas. La sesión puede partir por ahí."},
-    {t:"Con algo que me pesa", d:"Me está afectando más allá de lo académico.", say:"Llego con algo que me está pesando.", tip:"Si quieres, cuenta también lo que te está pesando. Quien te atienda puede orientarte."}
+    {t:"Herramientas para aplicar ya", d:"Estrategias concretas para esta semana.", say:"Busco herramientas para aplicar de inmediato.", tip:"Cuenta qué tarea o evaluación tienes más cerca."},
+    {t:"Entender cómo trabajo", d:"Revisar mi forma de estudiar o hacer tareas.", say:"Busco entender mejor cómo trabajo.", tip:"Cuenta cómo trabajas hoy, paso a paso."},
+    {t:"Un plan para el semestre", d:"Pasos concretos para las próximas semanas.", say:"Busco un plan para el resto del semestre.", tip:"Cuenta qué te gustaría lograr al final del semestre."}
   ]};
 
 /* ---------- estado ---------- */
 let step=1, area=null, picks=[];   // picks: [q1opt, q2opt, q3opt, q4opt]
 const $=id=>document.getElementById(id);
-const STEP_LABELS=["Tu línea","Lo que te pasa","Tu contexto","Cómo llegas","Tu ruta"];
+const STEP_LABELS=["Tu línea","Qué aprender","Tu contexto","Qué buscas","Tu ruta"];
 
 /* ---------- registro local del stand ---------- */
 const STORE="rutaStand.v2";
@@ -866,9 +863,9 @@ function showResult(){
 
   const stops=[
     ["Tu punto de partida", a.say],
-    ["Lo que te pasa", s2.say],
+    ["Lo que quieres aprender", s2.say],
     ["Tu contexto", s3.say],
-    ["Cómo llegas hoy", s4.say],
+    ["Lo que buscas", s4.say],
     ["Dónde agendar", S.name]
   ];
   $("vroute").innerHTML=stops.map(s=>`<div class="vstop"><i></i><div><b>${s[0]}</b><span>${s[1]}</span></div></div>`).join("");
