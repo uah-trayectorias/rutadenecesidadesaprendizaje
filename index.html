@@ -15,6 +15,7 @@
    ========================================================= */
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 :root{
   color-scheme: dark;
   --u: max(6.5px, min(1vw, 1.8vh));
@@ -36,7 +37,7 @@
   /* una línea por servicio */
   --lea:#FF6B57;   /* Lectura y análisis de textos */
   --esc:#FF9A3C;   /* Escritura */
-  --ora:#FF6FB5;   /* Comunicación oral */
+  --ora:#EE5FD6;   /* Comunicación oral */
   --mat:#2FD08F;   /* Matemática */
   --fis:#34C6E0;   /* Física */
   --est:#FFC23D;   /* Estrategias de estudio y gestión del tiempo */
@@ -65,10 +66,10 @@ body[data-look="editorial"]{
 
   --lea:#D6452F;
   --esc:#C4620E;
-  --ora:#C2337F;
+  --ora:#B3259F;
   --mat:#17875B;
   --fis:#0E7C93;
-  --est:#A87800;
+  --est:#8A6300;
   --mot:#6B3FB5;
   --psi:#2A5FC4;
   --gen:#4B4364;
@@ -76,6 +77,34 @@ body[data-look="editorial"]{
   --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --display-wdth:100;
 }
+
+body[data-look="contraste"]{
+  color-scheme: dark;
+  --bg:#000000;
+  --bg2:#111111;
+  --card:#000000;
+  --card-hi:#1A1A1A;
+  --ink:#FFFFFF;
+  --muted:#FFFFFF;
+  --rule:rgba(255,255,255,.75);
+  --cta:#FFE14D;
+  --cta-ink:#000000;
+  --ticket:#FFFFFF;
+  --ticket-ink:#000000;
+  --on-line:#000000;
+  --lea:#FF8A7A;
+  --esc:#FFB066;
+  --ora:#FF8AE2;
+  --mat:#5CF2AE;
+  --fis:#6EE7FF;
+  --est:#FFE14D;
+  --mot:#D6C4FF;
+  --psi:#9CC2FF;
+  --gen:#FFFFFF;
+}
+body[data-look="contraste"] .kiosk::before{display:none}
+body[data-look="contraste"] .option{border-color:var(--ink)}
+body[data-look="contraste"] .note{border:2px solid var(--ink)}
 
 html,body{height:100%}
 body{
@@ -142,9 +171,10 @@ button:focus-visible,a:focus-visible{outline:calc(var(--u)*.3) solid var(--cta);
 .controls{display:flex;gap:calc(var(--u)*.6);align-items:center}
 .seg{display:flex;border:1px solid var(--rule);border-radius:999px;padding:3px}
 .seg button,.ghost{
-  border:0;background:none;border-radius:999px;
-  padding:calc(var(--u)*.45) calc(var(--u)*1);font-size:calc(var(--u)*.85);font-weight:700;color:var(--muted)
+  border:0;background:none;border-radius:999px;min-height:44px;min-width:44px;
+  padding:calc(var(--u)*.45) calc(var(--u)*1);font-size:max(14px, calc(var(--u)*.9));font-weight:700;color:var(--ink)
 }
+.ghost[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .ghost{border:1px solid var(--rule)}
 
@@ -197,7 +227,8 @@ h1,h2,h3{
 .attract-sub{font-size:calc(var(--u)*1.55);color:var(--muted);max-width:32ch;margin:0}
 .attract-sub b{color:var(--ink)}
 .attract-cta{display:flex;align-items:center;gap:calc(var(--u)*2);flex-wrap:wrap}
-.map-hint{background:transparent;color:var(--ink);border:calc(var(--u)*.25) solid var(--cta);font-weight:700;border-radius:999px;cursor:default;font-size:calc(var(--u)*1.6);padding:calc(var(--u)*1.1) calc(var(--u)*2.4)}
+.map-hint{color:var(--ink);font-weight:700;font-size:calc(var(--u)*1.7);display:flex;align-items:center;gap:calc(var(--u)*.8)}
+.map-hint b{color:var(--cta);font-size:1.3em;line-height:1}
 .attract-cta .btn{font-size:calc(var(--u)*1.7);padding:calc(var(--u)*1.3) calc(var(--u)*2.6)}
 .pulse{animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--cta) 55%, transparent)}60%{box-shadow:0 0 0 calc(var(--u)*1.4) transparent}}
@@ -207,9 +238,7 @@ h1,h2,h3{
 .map{width:100%;height:100%;max-height:calc(var(--u)*58);display:block}
 .map .track{fill:none;stroke-width:11;stroke-linecap:round;stroke-linejoin:round;transition:opacity .5s ease, stroke-width .5s ease}
 .map .train{fill:none;stroke:var(--bg);stroke-width:4;stroke-linecap:round;stroke-dasharray:3 45;animation:run 2.8s linear infinite;opacity:.75}
-.map .dim .track{opacity:.45}
-.map .dim .train{opacity:0}
-.map .dim text{opacity:.75}
+.map .g:not(.hl) .train{opacity:0}
 .map .hl .track{stroke-width:16}
 @keyframes run{to{stroke-dashoffset:-48}}
 .map .stn{fill:var(--bg);stroke-width:5}
@@ -233,7 +262,9 @@ h1,h2,h3{
 .options{display:grid;gap:calc(var(--u)*1.2);grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(0,1fr);min-height:0}
 .options.four{grid-template-columns:repeat(4,1fr)}
 .options.nine{grid-template-rows:repeat(3,minmax(0,1fr))}
-.options.tall{grid-template-rows:minmax(0,1fr)}
+.options.tall{grid-template-rows:auto;grid-auto-rows:auto;align-content:center}
+.options.tall .option{padding-block:calc(var(--u)*2.2)}
+#question:focus,#resTitle:focus{outline:none}
 .option{
   --c:var(--cta);
   text-align:left;border:calc(var(--u)*.22) solid var(--rule);background:var(--card);
@@ -352,6 +383,17 @@ h1,h2,h3{
 .extra strong{display:block;font-size:calc(var(--u)*1.1);line-height:1.2}
 .extra a{display:inline-block;margin-top:calc(var(--u)*.3);font-size:calc(var(--u)*1);font-weight:700;color:inherit}
 
+/* ---------- aviso de inactividad ---------- */
+.idle-warn{
+  position:fixed;left:50%;bottom:calc(var(--u)*6);transform:translateX(-50%);z-index:15;
+  background:var(--ink);color:var(--bg);border-radius:calc(var(--u)*1.4);
+  padding:calc(var(--u)*1.2) calc(var(--u)*1.6);display:flex;align-items:center;gap:calc(var(--u)*1.6);
+  font-size:calc(var(--u)*1.35);font-weight:700;box-shadow:0 10px 40px rgba(0,0,0,.35);max-width:calc(100% - 32px)
+}
+.idle-warn button{background:var(--cta);color:var(--cta-ink);border:0;border-radius:999px;font-weight:700;min-height:44px;padding:calc(var(--u)*.7) calc(var(--u)*1.6);font-size:calc(var(--u)*1.2)}
+.how{margin:0;padding-left:1.3em;font-size:calc(var(--u)*1.15);line-height:1.35;font-weight:700;display:grid;gap:calc(var(--u)*.2)}
+body.still *,body.still *::before,body.still *::after{animation:none!important;transition:none!important}
+
 /* ---------- barra inferior ---------- */
 .bottom{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*2);min-height:calc(var(--u)*3.2)}
 .bottom-note{color:var(--muted);font-size:calc(var(--u)*1)}
@@ -403,11 +445,13 @@ h1,h2,h3{
 
     <div class="steps" id="steps" hidden></div>
 
-    <div class="controls">
-      <div class="seg" role="group" aria-label="Estilo visual">
-        <button id="lookMetro" aria-pressed="true">Metro</button>
-        <button id="lookEdit" aria-pressed="false">Editorial</button>
+    <div class="controls" role="toolbar" aria-label="Opciones de visualización">
+      <div class="seg" role="group" aria-label="Colores de la pantalla">
+        <button id="lookMetro" aria-pressed="true">Oscuro</button>
+        <button id="lookEdit" aria-pressed="false">Claro</button>
+        <button id="lookHC" aria-pressed="false">Alto contraste</button>
       </div>
+      <button class="ghost" id="motionBtn" aria-pressed="false">Pausar movimiento</button>
       <button class="ghost" id="fsBtn">Pantalla completa</button>
     </div>
   </header>
@@ -423,17 +467,17 @@ h1,h2,h3{
         </div>
         <p class="attract-sub">Elige en el mapa la línea de lo que quieres aprender o fortalecer. Responde <b>3 preguntas</b> y te mostramos dónde agendar. Toma <b>1 minuto</b>.</p>
         <div class="attract-cta">
-          <div class="map-hint pulse">Toca una línea del mapa →</div>
+          <p class="map-hint">Toca una línea del mapa para empezar <b aria-hidden="true">→</b></p>
         </div>
       </div>
-      <svg class="map" id="map" viewBox="0 0 660 560" role="img" aria-label="Mapa de los apoyos de Trayectoria Estudiantil"></svg>
+      <svg class="map" id="map" viewBox="0 0 660 560" role="group" aria-label="Mapa de apoyos. Elige una línea para empezar."></svg>
     </section>
 
     <!-- 2 · PREGUNTAS -->
     <section class="screen" id="ask" aria-label="Pregunta">
       <div class="q-head">
         <div class="eyebrow" id="qCount">Pregunta 1 de 4</div>
-        <h2 id="question"></h2>
+        <h2 id="question" tabindex="-1"></h2>
         <p id="helper"></p>
       </div>
       <div class="options" id="options"></div>
@@ -447,7 +491,7 @@ h1,h2,h3{
     <section class="screen" id="result" aria-label="Tu ruta">
       <div class="res-main">
         <div class="res-tags" id="resTags"></div>
-        <h2 id="resTitle"></h2>
+        <h2 id="resTitle" tabindex="-1"></h2>
         <p id="resNeed"></p>
         <ul class="work" id="resWork"></ul>
         <div class="note" id="bringNote"><small>Para tu primera sesión</small><p id="resBring"></p></div>
@@ -466,14 +510,24 @@ h1,h2,h3{
         </div>
         <div class="perf"></div>
         <div class="qr-zone">
-          <div class="qr-box" id="qr"></div>
-          <p>Escanéalo con tu celular</p>
+          <div class="qr-box" id="qr" role="img" aria-label="Código QR para agendar"></div>
+          <ol class="how">
+            <li>Escanea el código con tu celular</li>
+            <li>Elige día y hora</li>
+            <li>Confirma tu reserva</li>
+          </ol>
           <a class="btn btn-book" id="bookBtn" href="#" target="_blank" rel="noopener">Agenda aquí →</a>
         </div>
         <div class="extras" id="extras"></div>
       </aside>
     </section>
   </main>
+
+  <div class="sr-only" id="srLive" role="status" aria-live="polite"></div>
+  <div class="idle-warn" id="idleWarn" hidden role="alert">
+    <span>¿Sigues ahí? Volveremos al mapa en <span id="warnSecs">15</span> segundos.</span>
+    <button id="stayBtn">Seguir aquí</button>
+  </div>
 
   <footer class="bottom">
     <div class="bottom-note" id="bottomNote">Apoyos gratuitos para estudiantes de pregrado UAH</div>
@@ -548,7 +602,8 @@ const SERVICES = {
 };
 
 
-const IDLE_SECONDS = 60;
+const IDLE_SECONDS = 90;      // tiempo sin uso antes de volver al mapa
+const WARN_SECONDS = 15;      // aviso previo con opción de seguir
 const PHRASE_SECONDS = 4;
 
 const PHRASES = [
@@ -751,7 +806,7 @@ function drawMap(){
   MAP_ORDER.forEach((k,i)=>{
     const y=40+i*60, d=Math.abs(y-oy), x2=bend+d*.5, ar=AREAS.find(a=>a.line===k);
     const path=`M${ox} ${oy} L${bend} ${oy} L${x2.toFixed(1)} ${y.toFixed(1)} L${endX} ${y.toFixed(1)}`;
-    html+=`<g class="g" data-line="${k}" role="button" tabindex="0" aria-label="Ruta ${SERVICES[k].name}">
+    html+=`<g class="g" data-line="${k}" role="button" tabindex="0" aria-label="${SERVICES[k].name}: ${ar?ar.t:""}">
       <path class="hit" d="${path}"/>
       <rect class="hitbox" x="${endX-340}" y="${(y-32).toFixed(1)}" width="340" height="58"/>
       <path class="track" d="${path}" stroke="var(--${k})"/>
@@ -777,16 +832,18 @@ function highlightLine(k){
 
 /* ---------- frases ---------- */
 let pIdx=0, pTimer=null;
+let pFade=null, motionPaused=false;
 function showPhrase(i){
   const [k,txt]=PHRASES[i], ph=$("phrase"), tag=$("phraseTag");
   ph.classList.add("out"); tag.classList.add("out");
-  setTimeout(()=>{
+  clearTimeout(pFade);
+  pFade=setTimeout(()=>{
     ph.textContent=txt; tag.textContent=SERVICES[k].map; tag.style.setProperty("--c",`var(--${k})`);
     ph.classList.remove("out"); tag.classList.remove("out"); highlightLine(k);
   },450);
 }
-function startPhrases(){stopPhrases();pIdx=0;showPhrase(0);pTimer=setInterval(()=>{pIdx=(pIdx+1)%PHRASES.length;showPhrase(pIdx)},PHRASE_SECONDS*1000)}
-function stopPhrases(){if(pTimer){clearInterval(pTimer);pTimer=null}}
+function startPhrases(){stopPhrases();pIdx=0;showPhrase(0);if(motionPaused)return;pTimer=setInterval(()=>{pIdx=(pIdx+1)%PHRASES.length;showPhrase(pIdx)},PHRASE_SECONDS*1000)}
+function stopPhrases(){if(pTimer){clearInterval(pTimer);pTimer=null}clearTimeout(pFade);pFade=null}
 
 /* ---------- pasos superiores ---------- */
 function drawSteps(){
@@ -805,7 +862,7 @@ function show(id){
   $("steps").hidden = id==="attract";
   $("againBtn").hidden = id==="attract";
   $("bottomNote").textContent = id==="attract" ? "Apoyos gratuitos para estudiantes de pregrado UAH"
-    : id==="ask" ? "También puedes usar las teclas numéricas" : "Tu ruta se arma con las opciones que elegiste";
+    : id==="ask" ? "Puedes volver a la pregunta anterior cuando quieras" : "Tu ruta se arma con las opciones que elegiste";
   if(id==="attract"){startPhrases();stopIdle();document.body.style.removeProperty("--route")}
   else{stopPhrases();resetIdle()}
 }
@@ -824,6 +881,8 @@ function renderStep(){
   const Q=currentQuestion();
   $("qCount").textContent=`Pregunta ${step} de 3`;
   $("question").textContent=Q.q; $("helper").textContent=Q.h;
+  $("srLive").textContent=`Pregunta ${step} de 3. ${Q.q}`;
+  setTimeout(()=>{ if($("ask").classList.contains("active")) $("question").focus({preventScroll:true}) },60);
   $("backBtn").textContent = step===1 ? "← Volver al mapa" : "← Pregunta anterior";
   setSteps(step, area.line);
   const box=$("options");
@@ -852,7 +911,8 @@ function goBack(){if(step<=1){show("attract");return}step--;picks.length=step+1;
 /* ---------- QR ---------- */
 function makeQR(el,url,size){
   el.innerHTML="";
-  if(window.QRCode){new QRCode(el,{text:url,width:size,height:size,colorDark:"#15132E",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}
+  if(window.QRCode){new QRCode(el,{text:url,width:size,height:size,colorDark:"#15132E",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+    el.querySelectorAll("img,canvas").forEach(n=>{n.setAttribute("alt","");n.setAttribute("aria-hidden","true")})}
   else el.innerHTML=`<span style="color:#15132E;font-size:12px;text-align:center;word-break:break-all">Agenda en bookings UAH</span>`;
 }
 
@@ -869,7 +929,7 @@ function showResult(){
   $("resNeed").textContent=s2.need;
   $("resWork").innerHTML=S.work.map(w=>`<li>${w}</li>`).join("");
   $("resBring").textContent=s3.bring+" "+s4.tip;
-  $("extraNotes").innerHTML=extras.length?`<div class="note">${extras.map(k=>`<small style="color:var(--${k})">Combinación · ${SERVICES[k].map}</small><p>${EXTRA_WHY[k]}</p>`).join("")}</div>`:"";
+  $("extraNotes").innerHTML=extras.length?`<div class="note">${extras.map(k=>`<small style="color:var(--${k})">Combinación · ${SERVICES[k].map}</small><p></p>`).join("")}</div>`:"";
 
   const stops=[
     ["Tu punto de partida", a.say],
@@ -884,6 +944,9 @@ function showResult(){
   $("ticket").classList.toggle("has-extra",extras.length>0);
   $("ticket").classList.toggle("two-extra",extras.length>1);
   makeQR($("qr"),S.url,360);
+  $("qr").setAttribute("aria-label",`Código QR para agendar ${S.name}`);
+  $("srLive").textContent=`Tu ruta: ${S.name}. ${S.title}`;
+  setTimeout(()=>$("resTitle").focus({preventScroll:true}),60);
   $("bookBtn").href=S.url;
   $("extras").innerHTML=extras.map((k,i)=>`<div class="extra"><div class="qr-mini" id="qrx${i}"></div><div><small>Suma también</small><strong>${SERVICES[k].name}</strong><a href="${SERVICES[k].url}" target="_blank" rel="noopener">Agenda aquí →</a></div></div>`).join("");
   extras.forEach((k,i)=>makeQR($("qrx"+i),SERVICES[k].url,180));
@@ -895,27 +958,45 @@ function showResult(){
 }
 
 /* ---------- inactividad ---------- */
-let idleEnd=0, idleRAF=null;
-function resetIdle(){idleEnd=Date.now()+IDLE_SECONDS*1000;$("timer").hidden=false;if(!idleRAF)tickIdle()}
-function stopIdle(){$("timer").hidden=true;if(idleRAF){cancelAnimationFrame(idleRAF);idleRAF=null}}
+let idleEnd=0, idleTimer=null;
+function resetIdle(){
+  idleEnd=Date.now()+IDLE_SECONDS*1000;
+  $("idleWarn").hidden=true;
+  if(!idleTimer) idleTimer=setInterval(tickIdle,250);
+}
+function stopIdle(){$("timer").hidden=true;$("idleWarn").hidden=true;if(idleTimer){clearInterval(idleTimer);idleTimer=null}}
 function tickIdle(){
-  const left=Math.max(0,idleEnd-Date.now());
-  $("timerTxt").textContent=`Vuelve al inicio en ${Math.ceil(left/1000)} s`;
-  $("timerBar").style.transform=`scaleX(${left/(IDLE_SECONDS*1000)})`;
-  if(left<=0){idleRAF=null;show("attract");return}
-  idleRAF=requestAnimationFrame(tickIdle);
+  const left=Math.max(0,idleEnd-Date.now()), secs=Math.ceil(left/1000);
+  if(left<=0){stopIdle();show("attract");return}
+  const warn=secs<=WARN_SECONDS;
+  if(warn){ $("warnSecs").textContent=secs; if($("idleWarn").hidden) $("idleWarn").hidden=false; }
+  else if(!$("idleWarn").hidden) $("idleWarn").hidden=true;
 }
 ["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(!$("attract").classList.contains("active"))resetIdle()},{passive:true}));
+$("stayBtn").onclick=()=>resetIdle();
 
 /* ---------- estilo visual ---------- */
 function setLook(look){
   document.body.dataset.look=look;
   $("lookMetro").setAttribute("aria-pressed",look==="metro");
   $("lookEdit").setAttribute("aria-pressed",look==="editorial");
+  $("lookHC").setAttribute("aria-pressed",look==="contraste");
   try{localStorage.setItem("rutaStand.look",look)}catch(e){}
 }
 $("lookMetro").onclick=e=>{e.stopPropagation();setLook("metro")};
 $("lookEdit").onclick=e=>{e.stopPropagation();setLook("editorial")};
+$("lookHC").onclick=e=>{e.stopPropagation();setLook("contraste")};
+function setMotion(paused){
+  motionPaused=paused;
+  document.body.classList.toggle("still",paused);
+  $("motionBtn").setAttribute("aria-pressed",paused);
+  $("motionBtn").textContent=paused?"Reanudar movimiento":"Pausar movimiento";
+  if($("attract").classList.contains("active")){ if(paused){ if(pTimer){clearInterval(pTimer);pTimer=null} } else startPhrases(); }
+  try{localStorage.setItem("rutaStand.still",paused?"1":"0")}catch(e){}
+}
+$("motionBtn").onclick=e=>{e.stopPropagation();setMotion(!motionPaused)};
+try{ if(localStorage.getItem("rutaStand.still")==="1") setMotion(true) }catch(e){}
+try{ if(matchMedia("(prefers-reduced-motion: reduce)").matches) setMotion(true) }catch(e){}
 try{const l=localStorage.getItem("rutaStand.look");if(l)setLook(l)}catch(e){}
 
 $("fsBtn").onclick=e=>{
@@ -954,7 +1035,7 @@ $("againBtn").onclick=()=>show("attract");
 document.addEventListener("keydown",e=>{
   if(!$("admin").hidden){if(e.key==="Escape")$("admin").hidden=true;return}
   if(e.key==="Escape"){show("attract");return}
-  if(e.key==="a"||e.key==="A"){openAdmin();return}
+  if(e.key==="A"&&e.shiftKey){openAdmin();return}
   if($("ask").classList.contains("active")){
     const n=parseInt(e.key,10), opts=document.querySelectorAll("#options .option");
     if(n>=1&&n<=opts.length) opts[n-1].click();
